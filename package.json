@@ -1,0 +1,19 @@
+{
+  "name": "technical-interview-susi-air",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Susi Air Pilot App - Nuxt 3 Frontend and NestJS Backend Monorepo",
+  "scripts": {
+    "dev": "pnpm --parallel --filter nest --filter nuxt dev",
+    "dev:nest": "pnpm --filter nest start:dev",
+    "dev:nuxt": "pnpm --filter nuxt dev",
+    "build": "pnpm --filter nest build && pnpm --filter nuxt build",
+    "test": "pnpm --filter nest test",
+    "test:watch": "pnpm --filter nest test:watch",
+    "test:cov": "pnpm --filter nest test:cov"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "pnpm@10.2.0"
+}
