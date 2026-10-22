@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: nest/Dockerfile
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - APP_TODAY=2026-05-15
+      - JWT_SECRET=susi-air-recruitment-pilot-jwt-secret-key-2026
