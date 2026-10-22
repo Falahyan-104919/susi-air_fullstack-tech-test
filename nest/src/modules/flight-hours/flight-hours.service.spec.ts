@@ -24,6 +24,7 @@ describe('FlightHoursService', () => {
 
     const mockDataService = {
       getFlightHoursMap: () => flightMap,
+      getFlightHoursForDate: (date: string) => flightMap.get(date) || 0,
       getLimits: () => ({ daily: 8, weekly: 40, monthly: 100, annual: 1050 }),
       getChartBounds: () => ({
         '1w': { limit: 40, max: 45, windowDays: 7, displayRangeDays: 7 },

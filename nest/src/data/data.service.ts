@@ -84,6 +84,14 @@ export class DataService implements OnModuleInit {
     return this.flightHoursMap;
   }
 
+  /**
+   * Query flight hours for a specific date (YYYY-MM-DD).
+   * Missing dates or pre-inception dates return 0.
+   */
+  getFlightHoursForDate(date: string): number {
+    return this.flightHoursMap.get(date) || 0;
+  }
+
   getFlightHoursCount(): number {
     return this.flightHoursMap.size;
   }
@@ -106,6 +114,13 @@ export class DataService implements OnModuleInit {
 
   getSchedules(): ScheduleEntry[] {
     return this.schedules;
+  }
+
+  /**
+   * Query schedule entries for a specific YYYY-MM month prefix.
+   */
+  findSchedulesByMonth(prefix: string): ScheduleEntry[] {
+    return this.schedules.filter((s) => s.duty_date.startsWith(prefix));
   }
 
   getLegends(): LegendItem[] {

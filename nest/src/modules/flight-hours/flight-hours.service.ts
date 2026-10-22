@@ -13,21 +13,19 @@ export class FlightHoursService {
    * Future dates within the dataset contribute their planned/rostered flight hours.
    */
   calculateRollingSum(targetDate: string, windowDays: number): number {
-    const flightMap = this.dataService.getFlightHoursMap();
     let sum = 0;
     const targetMs = new Date(`${targetDate}T00:00:00Z`).getTime();
 
     for (let i = 0; i < windowDays; i++) {
       const d = new Date(targetMs - i * 86400000);
       const iso = d.toISOString().split('T')[0];
-      sum += flightMap.get(iso) || 0;
+      sum += this.dataService.getFlightHoursForDate(iso);
     }
 
     return Math.round(sum * 10) / 10;
   }
 
   getRange(from: string, to: string): DailyHourEntry[] {
-    const flightMap = this.dataService.getFlightHoursMap();
     const startMs = new Date(`${from}T00:00:00Z`).getTime();
     const endMs = new Date(`${to}T00:00:00Z`).getTime();
 
@@ -46,7 +44,7 @@ export class FlightHoursService {
       const iso = new Date(currentMs).toISOString().split('T')[0];
       entries.push({
         date: iso,
-        hours: flightMap.get(iso) || 0,
+        hours: this.dataService.getFlightHoursForDate(iso),
       });
       currentMs += 86400000;
     }
@@ -60,12 +58,11 @@ export class FlightHoursService {
       throw new BadRequestException(`Unsupported range: ${range}`);
     }
 
-    const flightMap = this.dataService.getFlightHoursMap();
     const limits = this.dataService.getLimits();
     const today = APP_TODAY;
 
     // 1. Calculate 4 Regulatory Limit Cards (dynamic from config)
-    const dailyCurrent = flightMap.get(today) || 0;
+    const dailyCurrent = this.dataService.getFlightHoursForDate(today);
     const weeklyCurrent = this.calculateRollingSum(today, 7);
     const monthlyCurrent = this.calculateRollingSum(today, 30);
     const annualCurrent = this.calculateRollingSum(today, 365);
@@ -105,7 +102,7 @@ export class FlightHoursService {
       const d = new Date(todayMs + offset * 86400000);
       const iso = d.toISOString().split('T')[0];
       const rollingSum = this.calculateRollingSum(iso, boundsConfig.windowDays);
-      const dailyHours = flightMap.get(iso) || 0;
+      const dailyHours = this.dataService.getFlightHoursForDate(iso);
 
       series.push({
         date: iso,

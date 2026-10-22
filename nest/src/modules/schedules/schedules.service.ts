@@ -17,9 +17,7 @@ export class SchedulesService {
     }
     const paddedMonth = monthNum.toString().padStart(2, '0');
     const prefix = `${year}-${paddedMonth}`;
-    const allSchedules = this.dataService.getSchedules();
-
-    const filtered = allSchedules.filter((s) => s.duty_date.startsWith(prefix));
+    const filtered = this.dataService.findSchedulesByMonth(prefix);
 
     const entries: EnrichedScheduleEntry[] = filtered.map((s) => {
       // Guard against 0 === 0 edge cases

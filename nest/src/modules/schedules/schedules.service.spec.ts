@@ -6,39 +6,43 @@ describe('SchedulesService', () => {
   let service: SchedulesService;
 
   beforeEach(async () => {
+    const mockSchedules = [
+      {
+        id: '1',
+        duty_date: '2026-05-15',
+        status: 1,
+        base_name: 'MKW',
+        base_color: '#10B981',
+        duty_type: 'DTY',
+        count_schedules: 4,
+        count_logbooks: 4,
+      },
+      {
+        id: '2',
+        duty_date: '2026-05-19',
+        status: 1,
+        base_name: 'SIQ',
+        base_color: '#10B981',
+        duty_type: 'DTY',
+        count_schedules: 2,
+        count_logbooks: 0,
+      },
+      {
+        id: '3',
+        duty_date: '2026-05-20',
+        status: 1,
+        base_name: 'OFF',
+        base_color: '#E2E8F0',
+        duty_type: 'OFF',
+        count_schedules: 0,
+        count_logbooks: 0,
+      },
+    ];
+
     const mockDataService = {
-      getSchedules: () => [
-        {
-          id: '1',
-          duty_date: '2026-05-15',
-          status: 1,
-          base_name: 'MKW',
-          base_color: '#10B981',
-          duty_type: 'DTY',
-          count_schedules: 4,
-          count_logbooks: 4,
-        },
-        {
-          id: '2',
-          duty_date: '2026-05-19',
-          status: 1,
-          base_name: 'SIQ',
-          base_color: '#10B981',
-          duty_type: 'DTY',
-          count_schedules: 2,
-          count_logbooks: 0,
-        },
-        {
-          id: '3',
-          duty_date: '2026-05-20',
-          status: 1,
-          base_name: 'OFF',
-          base_color: '#E2E8F0',
-          duty_type: 'OFF',
-          count_schedules: 0,
-          count_logbooks: 0,
-        },
-      ],
+      getSchedules: () => mockSchedules,
+      findSchedulesByMonth: (prefix: string) =>
+        mockSchedules.filter((s) => s.duty_date.startsWith(prefix)),
       getLegends: () => [{ code: 'DTY', label: 'On Duty', color: '#10B981' }],
     };
 
