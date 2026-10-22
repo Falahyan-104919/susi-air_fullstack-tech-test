@@ -25,13 +25,19 @@ export class FlightHoursService {
     return Math.round(sum * 10) / 10;
   }
 
+  private isValidDateString(dateStr: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    const d = new Date(`${dateStr}T00:00:00Z`);
+    return !isNaN(d.getTime()) && d.toISOString().split('T')[0] === dateStr;
+  }
+
   getRange(from: string, to: string): DailyHourEntry[] {
+    if (!this.isValidDateString(from) || !this.isValidDateString(to)) {
+      throw new BadRequestException('Invalid date format. Expected valid YYYY-MM-DD calendar date');
+    }
+
     const startMs = new Date(`${from}T00:00:00Z`).getTime();
     const endMs = new Date(`${to}T00:00:00Z`).getTime();
-
-    if (isNaN(startMs) || isNaN(endMs)) {
-      throw new BadRequestException('Invalid date format. Expected YYYY-MM-DD');
-    }
 
     if (startMs > endMs) {
       throw new BadRequestException('from date must be before or equal to to date');

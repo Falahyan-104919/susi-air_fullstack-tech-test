@@ -31,10 +31,9 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/nest/dist ./nest/dist
 COPY nest/data ./nest/data
 
-# Configurable runtime environment variables with production defaults
+# Configurable runtime environment variables
 ENV PORT=3001
 ENV APP_TODAY=2026-05-15
-ENV JWT_SECRET=susi-air-recruitment-pilot-jwt-secret-key-2026
 
 EXPOSE ${PORT}
 

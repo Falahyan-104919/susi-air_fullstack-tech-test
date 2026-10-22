@@ -64,4 +64,8 @@ describe('FlightHoursService', () => {
     expect(summary.series[7].isToday).toBe(true);
     expect(summary.series[8].isProjected).toBe(true);
   });
+
+  it('should reject impossible calendar dates like 2026-02-30', () => {
+    expect(() => service.getRange('2026-02-30', '2026-03-05')).toThrow();
+  });
 });
