@@ -1,0 +1,48 @@
+// =============================================================================
+// Susi Air Design System - SCSS Mixins
+// =============================================================================
+
+@mixin mobile-only {
+  @media (max-width: 639px) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: 640px) {
+    @content;
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin card-surface {
+  background-color: $color-surface;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-card;
+}
+
+@mixin safe-area-bottom($extra: 0px) {
+  padding-bottom: calc(#{$extra} + env(safe-area-inset-bottom, 0px));
+}
+
+@mixin safe-area-top($extra: 0px) {
+  padding-top: calc(#{$extra} + env(safe-area-inset-top, 0px));
+}
+
+@mixin truncate-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
