@@ -34,8 +34,9 @@ export function useApiClient() {
       requestHeaders['Authorization'] = `Bearer ${tokenCookie.value}`;
     }
 
+    const base = (config.public.apiBase || 'http://localhost:3001').replace(/\/+$/, '');
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${config.public.apiBase}${cleanEndpoint}`;
+    const url = `${base}${cleanEndpoint}`;
 
     try {
       const response = await $fetch<T>(url, {
