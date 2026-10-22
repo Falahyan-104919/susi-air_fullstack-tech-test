@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { useAuthStore } from './auth';
+import { useApiClient, ApiError } from '~/composables/useApiClient';
 import type { LegendItem, ScheduleEntry, SchedulesResponse } from '~/types';
 
 export const useScheduleStore = defineStore('schedule', () => {
@@ -12,44 +12,28 @@ export const useScheduleStore = defineStore('schedule', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const config = useRuntimeConfig();
-  const authStore = useAuthStore();
+  const api = useApiClient();
 
   async function fetchSchedules(targetYear?: string, targetMonth?: string): Promise<ScheduleEntry[]> {
     if (targetYear) year.value = targetYear;
     if (targetMonth) month.value = targetMonth.padStart(2, '0');
 
-    if (!authStore.token) {
-      error.value = 'Not authenticated';
-      return [];
-    }
-
     isLoading.value = true;
     error.value = null;
 
     try {
-      const res = await $fetch<SchedulesResponse>(
-        `${config.public.apiBase}/schedules`,
-        {
-          params: {
-            year: year.value,
-            month: month.value,
-          },
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
+      const res = await api.get<SchedulesResponse>('/schedules', {
+        params: {
+          year: year.value,
+          month: month.value,
         },
-      );
+      });
       entries.value = res.entries;
       legend.value = res.legend;
       today.value = res.today;
       return res.entries;
     } catch (err: any) {
-      const message =
-        err?.data?.message ||
-        err?.response?._data?.message ||
-        'Failed to fetch duty schedules';
-      error.value = Array.isArray(message) ? message.join(', ') : message;
+      error.value = err instanceof ApiError ? err.message : 'Failed to fetch duty schedules';
       return [];
     } finally {
       isLoading.value = false;

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { useAuthStore } from './auth';
+import { useApiClient, ApiError } from '~/composables/useApiClient';
 import type { SummaryRange, SummaryResponse } from '~/types';
 
 export const useFlightHoursStore = defineStore('flightHours', () => {
@@ -9,40 +9,24 @@ export const useFlightHoursStore = defineStore('flightHours', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const config = useRuntimeConfig();
-  const authStore = useAuthStore();
+  const api = useApiClient();
 
   async function fetchSummary(range?: SummaryRange): Promise<SummaryResponse | null> {
     if (range) {
       currentRange.value = range;
     }
 
-    if (!authStore.token) {
-      error.value = 'Not authenticated';
-      return null;
-    }
-
     isLoading.value = true;
     error.value = null;
 
     try {
-      const res = await $fetch<SummaryResponse>(
-        `${config.public.apiBase}/flight-hours/summary`,
-        {
-          params: { range: currentRange.value },
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
-        },
-      );
+      const res = await api.get<SummaryResponse>('/flight-hours/summary', {
+        params: { range: currentRange.value },
+      });
       summary.value = res;
       return res;
     } catch (err: any) {
-      const message =
-        err?.data?.message ||
-        err?.response?._data?.message ||
-        'Failed to fetch flight hours summary';
-      error.value = Array.isArray(message) ? message.join(', ') : message;
+      error.value = err instanceof ApiError ? err.message : 'Failed to fetch flight hours summary';
       return null;
     } finally {
       isLoading.value = false;

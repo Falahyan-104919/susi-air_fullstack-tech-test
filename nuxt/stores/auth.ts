@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
+import { useApiClient, ApiError } from '~/composables/useApiClient';
 import type { PilotProfile, LoginResponse } from '~/types';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -11,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const config = useRuntimeConfig();
+  const api = useApiClient();
 
   const isAuthenticated = computed(() => !!token.value);
 
@@ -19,22 +20,16 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const res = await $fetch<LoginResponse>(
-        `${config.public.apiBase}/auth/login`,
-        {
-          method: 'POST',
-          body: { username, password },
-        },
+      const res = await api.post<LoginResponse>(
+        '/auth/login',
+        { username, password },
+        { requiresAuth: false },
       );
       token.value = res.accessToken;
       pilot.value = res.pilot;
       return res;
     } catch (err: any) {
-      const message =
-        err?.data?.message ||
-        err?.response?._data?.message ||
-        'Authentication failed. Please check your credentials.';
-      error.value = Array.isArray(message) ? message.join(', ') : message;
+      error.value = err instanceof ApiError ? err.message : 'Authentication failed';
       throw err;
     } finally {
       isLoading.value = false;
@@ -44,19 +39,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchProfile(): Promise<PilotProfile | null> {
     if (!token.value) return null;
     try {
-      const res = await $fetch<PilotProfile>(`${config.public.apiBase}/pilot/me`, {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-      });
+      const res = await api.get<PilotProfile>('/pilot/me');
       pilot.value = res;
       return res;
-    } catch (err: any) {
-      // Only force logout on genuine 401 Unauthorized
-      const status = err?.statusCode || err?.response?.status;
-      if (status === 401) {
-        logout();
-      }
+    } catch {
       return null;
     }
   }
