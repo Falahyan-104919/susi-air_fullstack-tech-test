@@ -32,6 +32,8 @@ export class DataService implements OnModuleInit {
   private resolveDataPath(filename: string): string {
     const candidates = [
       path.join(__dirname, '../../data', filename),
+      path.join(__dirname, '../data', filename),
+      path.join(__dirname, 'data', filename),
       path.join(process.cwd(), 'data', filename),
       path.join(process.cwd(), 'nest/data', filename),
       path.join(process.cwd(), 'materials', filename),
