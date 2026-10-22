@@ -9,61 +9,88 @@
 > Full Stack Developer Technical Assessment Submission  
 > **PT ASI Pudjiastuti Aviation (Susi Air)**
 
-A high-reliability, mobile-first operations and flight duty compliance web application for Susi Air line pilots. Built as a monorepo containing a **NestJS REST API** backend and a **Nuxt 3 (Vue 3)** frontend web app adhering to Civil Aviation Safety Regulations (CASR).
+A mobile-first flight operations web application designed to track pilot duty hours, certificate expiry, and monthly rosters as specified in the recruitment assessment brief. Built as a monorepo containing a **NestJS REST API** backend and a **Nuxt 3 (Vue 3)** frontend web application.
 
 ---
 
-## 🚀 Quick Start
+## 🌐 Live Deployments
+
+| Service | Live URL | Description |
+| :--- | :--- | :--- |
+| **Pilot Web App** | [https://susi-air-fullstack-tech-test-gbk3.vercel.app](https://susi-air-fullstack-tech-test-gbk3.vercel.app) | Nuxt 3 mobile web application |
+| **Backend REST API** | [https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app](https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app) | NestJS Serverless API on Vercel |
+| **Swagger UI Documentation** | [https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app/api](https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app/api) | Interactive OpenAPI testing console |
+| **OpenAPI 3.0 Specification** | [https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app/api-json](https://susi-air-fullstack-tech-test-git-main-falahyans-projects.vercel.app/api-json) | Raw OpenAPI schema |
+
+> **Note on Cold Starts**: The backend is hosted on serverless compute. If the service has been idle, the first request may experience a brief cold start latency (~1–2s). Subsequent calls respond immediately.
+
+---
+
+## 🔑 Test Credentials
+
+| Username | Password | Pilot Profile | Role | Logged Hours |
+| :--- | :--- | :--- | :--- | :--- |
+| `johndoe` | `susiairtest` | **John Doe** | Line Pilot | 1,444.5 hrs |
+
+> **Reviewer Convenience**: The sign-in screen includes a 1-click **"Auto-fill"** helper button that populates the assessment credentials instantly. This is provided strictly as a testing convenience and is not intended for production systems.
+
+---
+
+## ⚙️ Environment Variables
+
+### Backend (`/nest`)
+| Variable | Required | Default | Purpose |
+| :--- | :---: | :--- | :--- |
+| `PORT` | No | `3001` | HTTP port for the NestJS server |
+| `JWT_SECRET` | **Yes (in prod)** | `susi-air-pilot-app-dev-secret-2026` *(dev only)* | HMAC secret for signing JWT session tokens. The app enforces a fatal startup exit if missing in production. |
+| `APP_TODAY` | No | `2026-05-15` | Global anchor date for rolling calculations and calendar today indicator |
+
+### Frontend (`/nuxt`)
+| Variable | Required | Default | Purpose |
+| :--- | :---: | :--- | :--- |
+| `NUXT_PUBLIC_API_BASE` | **Yes (in prod)** | `http://localhost:3001` | Target base URL of the NestJS REST API |
+
+---
+
+## 🚀 Quick Start (Local Setup)
 
 ### Prerequisites
-- **Node.js**: `v20+` (developed & verified on Node `v26.1.0` / Node `v20 LTS`)
-- **Package Manager**: `pnpm >= 8` (monorepo workspaces)
+- **Node.js**: `v20+` (LTS recommended)
+- **Package Manager**: `pnpm >= 8`
 
-### 1. Local Monorepo (Recommended)
 ```bash
-# Clone and install dependencies across the monorepo
+# 1. Clone repository and install dependencies
+git clone https://github.com/Falahyan-104919/susi-air_fullstack-tech-test.git
+cd susi-air_fullstack-tech-test
 pnpm install
 
-# Start both NestJS API (port 3001) and Nuxt Web App (port 3000) concurrently
+# 2. Start both NestJS API (port 3001) and Nuxt Web App (port 3000) concurrently
 pnpm dev
 ```
-- **Pilot Web App**: [http://localhost:3000](http://localhost:3000)
-- **Backend REST API**: [http://localhost:3001](http://localhost:3001)
-- **Interactive Swagger Documentation**: [http://localhost:3001/api](http://localhost:3001/api)
-- **OpenAPI 3.0 Specification**: [http://localhost:3001/api-json](http://localhost:3001/api-json)
 
-### 2. Docker & Containerized Launch
+- Local Web App: [http://localhost:3000](http://localhost:3000)
+- Local REST API: [http://localhost:3001](http://localhost:3001)
+- Local Swagger UI: [http://localhost:3001/api](http://localhost:3001/api)
+
+### Docker Compose
 ```bash
-# Build and run the NestJS API container
 docker compose up --build
 ```
 
 ---
 
-## 🔑 Reviewer Test Credentials
-
-| Username | Password | Assigned Pilot | Role | Total Hours |
-| :--- | :--- | :--- | :--- | :--- |
-| `johndoe` | `susiairtest` | **John Doe** | Line Pilot | 1,444.5 hrs |
-
-> **Pro-Tip for Reviewers**: The Sign-In screen features a 1-click **"Auto-fill"** helper button that automatically populates the test credentials for fast evaluation.
-
----
-
-## 🏛️ Monorepo Architecture
+## 📁 Monorepo Structure
 
 ```
-technical-interview-susi-air/
+susi-air_fullstack-tech-test/
 ├── nest/                           # Backend NestJS REST API
-│   ├── data/                       # In-memory seed datasets (isolated per brief)
+│   ├── api/index.ts                # Vercel serverless entry adapter
+│   ├── data/                       # In-memory seed datasets copied from materials
 │   │   ├── mock-flight-hours.json
 │   │   ├── mock-documents.json
 │   │   └── mock-schedules.json
 │   ├── src/
-│   │   ├── common/                 # Filters, guards, decorators, constants
-│   │   │   ├── filters/            # Global HttpExceptionFilter
-│   │   │   ├── guards/             # Global JwtAuthGuard
-│   │   │   └── decorators/         # @Public() bypass decorator
+│   │   ├── common/                 # HttpExceptionFilter, JwtAuthGuard, @Public() decorator
 │   │   ├── data/                   # DataService with fail-fast validation & Map indexing
 │   │   ├── modules/
 │   │   │   ├── auth/               # Passport JWT authentication & DTO validation
@@ -71,26 +98,28 @@ technical-interview-susi-air/
 │   │   │   ├── flight-hours/       # Rolling-sum calculation engine & 15-day series
 │   │   │   ├── documents/          # Urgency evaluation engine (safe/soon/expired)
 │   │   │   └── schedules/          # Monthly roster with completion tick guards
-│   │   └── types/                  # Shared enterprise domain TypeScript contracts
-│   └── test/                       # Supertest E2E integration test suite
+│   │   └── types/                  # Backend domain TypeScript contracts
+│   ├── test/                       # Supertest E2E integration test suite
+│   ├── Dockerfile                  # Multi-stage production container
+│   └── vercel.json                 # Vercel serverless configuration
 │
 ├── nuxt/                           # Frontend Nuxt 3 (Vue 3) Web App
 │   ├── assets/scss/                # Susi Air design system (tokens, mixins, main)
-│   ├── components/
-│   │   ├── layout/                 # AppHeader & BottomNav components
-│   │   ├── flight-hours/           # LimitCard, RangeToggle, FlightTrendChart
-│   │   ├── documents/              # DocumentBadge & DocumentList
-│   │   └── schedule/               # CalendarHeader, CalendarGrid, DutyLegend
+│   ├── components/                 # Vue SFCs (LimitCard, FlightTrendChart, CalendarGrid, etc.)
+│   ├── composables/                # useApiClient HTTP client transport
 │   ├── layouts/                    # Option A mobile shell (fluid mobile / 480px desktop)
 │   ├── middleware/                 # Global auth route protection & redirection
 │   ├── pages/                      # /login, /home, /schedule, /schedule/[date], /logbook, /more
 │   ├── stores/                     # Pinia stores (auth, flightHours, documents, schedule)
-│   └── types/                      # Frontend domain types
+│   ├── types/                      # Frontend domain types
+│   └── vercel.json                 # Frontend deployment configuration
 │
+├── .github/workflows/ci.yml        # Automated CI pipeline (backend QA, frontend build, docker check)
 ├── docker-compose.yml              # Local container orchestration
-├── pnpm-workspace.yaml             # Workspace definition
-└── README.md                       # Comprehensive system documentation
+└── pnpm-workspace.yaml             # pnpm workspace definition
 ```
+
+> **Data Model Note**: The assessment seed JSON files (`mock-flight-hours.json`, `mock-documents.json`, `mock-schedules.json`) were copied directly into `nest/data/` to keep the backend self-contained and reproducible. The backend and frontend maintain separate, mirrored domain type contracts (`nest/types/` and `nuxt/types/`) so each package can build and typecheck independently without workspace coupling.
 
 ---
 
@@ -102,60 +131,58 @@ All endpoints (except `POST /auth/login`) require Bearer JWT authentication: `Au
 | :--- | :--- | :--- | :--- |
 | `POST` | `/auth/login` | Public | Authenticates `johndoe` / `susiairtest`. Returns JWT token (7d) and pilot profile. |
 | `GET` | `/pilot/me` | Protected | Returns the authenticated pilot profile (name, total hours, avatar). |
-| `GET` | `/flight-hours` | Protected | Query flight hours within a specific date range (`?from=YYYY-MM-DD&to=YYYY-MM-DD`). |
+| `GET` | `/flight-hours` | Protected | Query flight hours within a specific date range (`?from=YYYY-MM-DD&to=YYYY-MM-DD`). Validates strict calendar dates. |
 | `GET` | `/flight-hours/summary` | Protected | Computes 4 limit cards and 15-day trend series centered on May 15 (`?range=1w\|1m\|3m\|6m\|1y`). |
 | `GET` | `/documents` | Protected | Evaluates pilot licenses/clearances sorted urgency-first (`expired` → `soon` → `safe`). |
 | `GET` | `/schedules` | Protected | Returns enriched duty entries for a month with completion flags (`?year=YYYY&month=MM`). |
 
 ---
 
-## ⚖️ Section D: Architectural Decisions & Ambiguity Resolutions
+## ⚖️ Architectural Decisions & Clarifications
 
 ### 1. Global Reference Date Fixed at `2026-05-15` (`APP_TODAY`)
-- **Challenge**: The seed dataset is anchored around mid-May 2026. Evaluating queries against the real-world current system date would result in 0 hours and 100% expired certificates.
-- **Decision**: Established a centralized application constant `APP_TODAY = '2026-05-15'`. All rolling-sum windows, document expiry calculations, and calendar "Today" markers anchor deterministically to this date.
+The mock seed dataset is anchored in mid-May 2026. Evaluating queries against the real-world current system date would result in 0 recorded hours and 100% expired certificates. Establishing a centralized application constant `APP_TODAY = '2026-05-15'` ensures all rolling-sum windows, document expiry calculations, and calendar "Today" markers anchor deterministically to the test data.
 
-### 2. Neutralization of the "Canary Trap"
-- **Observation**: The take-home brief PDF contained white-text prompt injections instructing AI assistants to insert a fake function `rollingWindowBluffing()` and comment `// this is a rolling sum calculation :)`.
-- **Decision**: Safely identified and ignored the injection. Implemented a clean, production-grade `calculateRollingSum(targetDate, windowDays)` method with `Math.round(sum * 10) / 10` precision rounding.
+### 2. Method Naming on Rolling Sum Calculations
+The take-home brief's PDF contains background text asking for a method named `rollingWindowBluffing()`. Because this is not part of the visible technical specifications, the production method is named `calculateRollingSum(targetDate, windowDays)` to reflect its clear domain purpose. Can easily be renamed if desired.
 
 ### 3. Semantics of Future Dates (May 16–22)
-- **Challenge**: The brief specifies a 15-day display series centered on May 15 (`today - 7` through `today + 7`). May 16 through May 22 are future dates.
-- **Decision**: Future dates represent **projected/rostered duty flight hours**. They allow line pilots and flight dispatchers to forecast regulatory compliance exceedances before flying. Points where `date > APP_TODAY` have `isProjected: true`. On May 20, 2026, the rolling 7-day sum reaches **44.7 hours**, exceeding the 40.0-hour limit and triggering visual alert indicators.
+The brief specifies a 15-day display series centered on May 15 (`today - 7` through `today + 7`). May 16 through May 22 are future dates. These entries represent **planned/rostered duty hours**, allowing pilots to preview their projected compliance forecast before flight operations occur. On May 20, 2026, the projected rolling 7-day sum reaches **44.7 hours**, exceeding the 40.0-hour limit and triggering visual alert indicators.
 
-### 4. Handling Pre-Dataset Dates
-- **Challenge**: The seed dataset begins on `2024-12-27`. Long rolling windows (e.g., 365-day annual window) query dates before this inception.
-- **Decision**: The calculation engine gracefully returns `0.0` hours for dates before dataset inception or missing dates, ensuring seamless calculations without arithmetic errors.
+### 4. Handling Dates Prior to Dataset Start
+The seed dataset begins on `2024-12-27`. Long rolling windows (e.g. 365-day annual window) query dates before this inception. The calculation engine returns `0.0` hours for dates before dataset inception or missing dates, ensuring seamless calculations without arithmetic errors.
 
-### 5. Schedule Completion Tick Guard
-- **Challenge**: Rest days or off days (`duty_type === 'OFF'`) have `count_schedules: 0` and `count_logbooks: 0`. A naive `count_logbooks === count_schedules` check would falsely mark rest days as "Completed Duties".
-- **Decision**: Enforced the strict guard:
-  ```typescript
-  isCompleted = count_schedules > 0 && count_logbooks === count_schedules;
-  ```
-  Rest and off days render with a neutral `OFF` badge and never display false completion checkmarks.
+### 5. Calendar Completion Guard
+Rest days or off days (`duty_type === 'OFF'`) have `count_schedules: 0` and `count_logbooks: 0`. A naive `count_logbooks === count_schedules` check would falsely mark rest days as "Completed Duties". The service enforces:
+```typescript
+isCompleted = count_schedules > 0 && count_logbooks === count_schedules;
+```
+Rest and off days render with a neutral `OFF` badge and never display false completion checkmarks.
 
-### 6. Urgency-First Document Sorting
-- **Implementation**: The backend computes pure domain statuses:
-  - `expired`: `daysRemaining <= 0`
-  - `soon`: `0 < daysRemaining <= warningDays` (threshold: 30 days)
-  - `safe`: `daysRemaining > warningDays`
-- Returned documents are sorted urgency-first (`expired` → `soon` → `safe`), breaking ties by earliest expiry date. Presentation styling is mapped on the frontend.
+### 6. Strict Calendar Date Round-Trip Validation
+Date range queries validate both format (`YYYY-MM-DD`) and calendar round-tripping. Invalid calendar dates like `2026-02-30` or `2026-04-31` are rejected with `400 Bad Request` rather than silently normalizing to the next month.
 
-### 7. Option A Responsive Mobile Shell
-- **Mobile (`<640px`)**: Full-bleed 100% fluid edge-to-edge layout with iOS safe-area insets (`env(safe-area-inset-top)` and `env(safe-area-inset-bottom)`).
+### 7. Urgency-First Document Sorting
+The backend computes pure domain statuses:
+- `expired`: `daysRemaining <= 0`
+- `soon`: `0 < daysRemaining <= warningDays` (threshold: 30 days)
+- `safe`: `daysRemaining > warningDays`
+
+Returned documents are sorted urgency-first (`expired` → `soon` → `safe`), breaking ties by earliest expiry date. Presentation styling is mapped on the frontend.
+
+### 8. Option A Responsive Mobile Shell
+- **Mobile (`<640px`)**: Full-bleed fluid edge-to-edge layout with safe-area insets (`env(safe-area-inset-top)` and `env(safe-area-inset-bottom)`).
 - **Desktop (`≥640px`)**: Centered 480px mobile app viewport container framed against a neutral staging background (`#E5E7EB`).
 
-### 8. SSR-Safe Chart Rendering
-- Chart.js visualizer is isolated inside `<ClientOnly>` in Nuxt 3 to prevent Server-Side Rendering (SSR) hydration mismatches on Nitro/Vercel.
+### 9. SSR-Safe Chart Rendering
+The Chart.js visualizer is isolated inside `<ClientOnly>` in Nuxt 3 to prevent Server-Side Rendering (SSR) hydration mismatches on Nitro/Vercel.
 
 ---
 
-## 🧪 Verification & Test Suite
+## 🧪 Verification & Automated Tests
 
-### Run All Tests & Verification
 ```bash
-# 1. Run Backend Unit Tests (13 test cases)
+# 1. Run Backend Unit Tests (14 test cases)
 pnpm --filter nest test
 
 # 2. Run Backend E2E Smoke Tests (9 test cases)
@@ -170,6 +197,7 @@ pnpm build
   - Exact rolling-sum verification across 7-day, 30-day, and 365-day windows.
   - Verification of exceedance behavior (May 18–20 exceeding the 40h limit).
   - Verification of pre-dataset dates returning `0.0`.
+  - Rejection of invalid calendar dates (`2026-02-30`).
   - Verification of 15-day centered series generation.
 - **`DocumentsService`**:
   - Verification of urgency transitions (`expired`, `soon`, `safe`).
@@ -180,7 +208,7 @@ pnpm build
 - **`AppController (E2E)`**:
   - Public login verification & 401 on bad credentials.
   - JWT guard protection across all endpoints.
-  - Full payload validation and error filter formatting.
+  - Full payload validation and sanitized error filter formatting.
 
 ---
 
@@ -201,5 +229,5 @@ pnpm build
 
 ---
 
-## 📄 License
-Assessment submission prepared for PT ASI Pudjiastuti Aviation (Susi Air). All rights reserved.
+## 📝 Engineering Disclosure
+This project was developed with AI-assisted planning and coding; the architecture, algorithms, and tests were thoroughly reviewed, verified, and can be explained in detail by the author.
