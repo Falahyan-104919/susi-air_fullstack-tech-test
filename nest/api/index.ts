@@ -9,6 +9,20 @@ import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter
 const server = express();
 let isInitialized = false;
 
+// Pre-flight & CORS headers on raw Express level
+server.use((req, res, next) => {
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
 async function bootstrap() {
   if (!isInitialized) {
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));

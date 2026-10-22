@@ -1,6 +1,9 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
+import defaultFlightHours from '../../data/mock-flight-hours.json';
+import defaultDocuments from '../../data/mock-documents.json';
+import defaultSchedules from '../../data/mock-schedules.json';
 import {
   PilotProfile,
   ChartBoundsConfig,
@@ -49,8 +52,13 @@ export class DataService implements OnModuleInit {
   }
 
   private loadFlightHours() {
-    const filePath = this.resolveDataPath('mock-flight-hours.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    let raw: any;
+    try {
+      const filePath = this.resolveDataPath('mock-flight-hours.json');
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+      raw = defaultFlightHours;
+    }
     this.pilotProfile = {
       name: raw.pilot.name,
       totalFlightHours: raw.pilot.totalFlightHours,
@@ -65,15 +73,25 @@ export class DataService implements OnModuleInit {
   }
 
   private loadDocuments() {
-    const filePath = this.resolveDataPath('mock-documents.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    let raw: any;
+    try {
+      const filePath = this.resolveDataPath('mock-documents.json');
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+      raw = defaultDocuments;
+    }
     this.warningDays = raw.thresholds?.warningDays || 30;
     this.documents = raw.documents;
   }
 
   private loadSchedules() {
-    const filePath = this.resolveDataPath('mock-schedules.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    let raw: any;
+    try {
+      const filePath = this.resolveDataPath('mock-schedules.json');
+      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+      raw = defaultSchedules;
+    }
     this.schedules = raw.schedules;
     this.legends = raw.legend;
   }
