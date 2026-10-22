@@ -31,6 +31,10 @@ export class FlightHoursService {
     const startMs = new Date(`${from}T00:00:00Z`).getTime();
     const endMs = new Date(`${to}T00:00:00Z`).getTime();
 
+    if (isNaN(startMs) || isNaN(endMs)) {
+      throw new BadRequestException('Invalid date format. Expected YYYY-MM-DD');
+    }
+
     if (startMs > endMs) {
       throw new BadRequestException('from date must be before or equal to to date');
     }

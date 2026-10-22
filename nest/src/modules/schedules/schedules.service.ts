@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { DataService } from '../../data/data.service';
 import { APP_TODAY } from '../../common/constants';
 import { EnrichedScheduleEntry, SchedulesResponse, LegendItem } from '../../types';
@@ -8,7 +8,14 @@ export class SchedulesService {
   constructor(private readonly dataService: DataService) {}
 
   getMonthSchedules(year: string, month: string): SchedulesResponse {
-    const paddedMonth = month.padStart(2, '0');
+    if (!/^\d{4}$/.test(year)) {
+      throw new BadRequestException('year must be a 4-digit number');
+    }
+    const monthNum = parseInt(month, 10);
+    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+      throw new BadRequestException('month must be between 01 and 12');
+    }
+    const paddedMonth = monthNum.toString().padStart(2, '0');
     const prefix = `${year}-${paddedMonth}`;
     const allSchedules = this.dataService.getSchedules();
 
