@@ -1,6 +1,6 @@
 # Susi Air — Pilot Operations & Flight Duty App
 
-[![CI Pipeline](https://github.com/falahyan/technical-interview-susi-air/actions/workflows/ci.yml/badge.svg)](https://github.com/falahyan/technical-interview-susi-air/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/Falahyan-104919/susi-air_fullstack-tech-test/actions/workflows/ci.yml/badge.svg)](https://github.com/Falahyan-104919/susi-air_fullstack-tech-test/actions/workflows/ci.yml)
 ![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
 ![pnpm Workspace](https://img.shields.io/badge/pnpm-workspace-orange)
 ![NestJS 10](https://img.shields.io/badge/nestjs-10.4-red)
