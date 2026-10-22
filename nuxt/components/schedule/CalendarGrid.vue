@@ -15,14 +15,14 @@
     <div class="days-grid">
       <!-- Leading empty padding days -->
       <div
-        v-for="pad in leadingBlankDays"
+        v-for="pad in matrix.leadingBlankDays"
         :key="`blank-${pad}`"
         class="calendar-cell blank-cell"
       />
 
       <!-- Month days -->
       <div
-        v-for="cell in monthDays"
+        v-for="cell in matrix.days"
         :key="cell.date"
         class="calendar-cell day-cell"
         :class="{
@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { buildMonthlyCalendarMatrix } from '~/utils/calendar-matrix';
 import type { ScheduleEntry } from '~/types';
 
 const props = defineProps<{
@@ -90,55 +91,8 @@ const props = defineProps<{
 
 const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-// Map entries by date YYYY-MM-DD
-const entryMap = computed(() => {
-  const map = new Map<string, ScheduleEntry>();
-  for (const entry of props.entries) {
-    map.set(entry.duty_date, entry);
-  }
-  return map;
-});
-
-// Calculate Monday-based start offset (0 = Monday, 6 = Sunday)
-const leadingBlankDays = computed(() => {
-  const y = parseInt(props.year, 10);
-  const m = parseInt(props.month, 10);
-  const firstDay = new Date(y, m - 1, 1);
-  return (firstDay.getDay() + 6) % 7;
-});
-
-const monthDays = computed(() => {
-  const y = parseInt(props.year, 10);
-  const m = parseInt(props.month, 10);
-  const totalDays = new Date(y, m, 0).getDate();
-
-  const days = [];
-  for (let day = 1; day <= totalDays; day++) {
-    const formattedDay = day.toString().padStart(2, '0');
-    const formattedMonth = m.toString().padStart(2, '0');
-    const dateStr = `${y}-${formattedMonth}-${formattedDay}`;
-
-    const entry = entryMap.value.get(dateStr) || null;
-    const isToday = dateStr === props.today;
-
-    const isCompleted = entry
-      ? entry.count_schedules > 0 && entry.count_logbooks === entry.count_schedules
-      : false;
-
-    const remainingDuties = entry
-      ? Math.max(0, entry.count_schedules - entry.count_logbooks)
-      : 0;
-
-    days.push({
-      date: dateStr,
-      dayNumber: day,
-      entry,
-      isToday,
-      isCompleted,
-      remainingDuties,
-    });
-  }
-  return days;
+const matrix = computed(() => {
+  return buildMonthlyCalendarMatrix(props.year, props.month, props.entries, props.today);
 });
 
 function navigateToDate(date: string) {
