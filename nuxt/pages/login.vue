@@ -223,7 +223,7 @@ async function handleSubmit() {
     transition: background-color 0.15s ease;
 
     &:hover {
-      background-color: darken(#FDE8EC, 5%);
+      background-color: #F8CAD3;
     }
   }
 }
